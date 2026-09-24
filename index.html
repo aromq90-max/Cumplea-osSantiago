@@ -7,13 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* Deshabilitar gestos de zoom, selección y desplazamientos no deseados en móviles */
-        html, body, button, div, canvas {
-            touch-action: manipulation;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
+        * {
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         html, body {
@@ -43,7 +40,6 @@
             text-shadow: 1px 1px #000000;
             box-shadow: inset -2px -2px 0px 0px #600000, 0 3px 0 #000;
             transition: transform 0.05s, box-shadow 0.05s;
-            cursor: pointer;
         }
 
         .nes-btn:active {
@@ -65,9 +61,6 @@
     </style>
 </head>
 <body class="flex flex-col items-center justify-center h-dvh w-screen text-white relative p-1 sm:p-2 overflow-hidden">
-
-    <!-- AUDIO MARIO.MP3 -->
-    <audio id="bgmAudio" src="./mario.mp3" loop preload="auto"></audio>
 
     <div class="relative w-full max-w-2xl h-full flex flex-col items-center justify-between py-1">
         
@@ -93,7 +86,7 @@
                 <span id="hud-time" class="text-white">400</span>
             </div>
 
-            <button id="audioToggle" type="button" class="bg-gray-800 border border-white px-1.5 py-0.5 rounded text-[10px]">🔊</button>
+            <button id="audioToggle" class="bg-gray-800 border border-white px-1.5 py-0.5 rounded hover:bg-gray-700 text-[10px]">🔊</button>
         </div>
 
         <!-- GAME CANVAS CONTAINER -->
@@ -101,7 +94,7 @@
             <canvas id="gameCanvas" width="256" height="224" class="w-full h-full pixel-art block object-contain"></canvas>
 
             <!-- MENÚ INICIAL -->
-            <div id="startMenuModal" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-2 text-center z-50">
+            <div id="startMenuModal" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-2 text-center z-30">
                 <div class="mario-border bg-gradient-to-b from-blue-900 via-indigo-950 to-black p-3 sm:p-5 max-w-sm w-full max-h-full overflow-y-auto rounded-xl flex flex-col items-center justify-center">
                     <div class="bg-red-600 text-yellow-300 border border-white px-2 py-0.5 text-[9px] sm:text-xs mb-1.5 animate-bounce rounded font-bold">
                         ★ SUPER MARIO BROS WORLD 1-1 ★
@@ -115,23 +108,23 @@
 
                     <!-- BOTONES DEL MENÚ -->
                     <div class="w-full space-y-2">
-                        <button id="btnPlayGame" type="button" class="nes-btn w-full py-3 rounded-lg text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                        <button id="btnPlayGame" class="nes-btn w-full py-2.5 sm:py-3 rounded-lg text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
                             <span>▶ JUGAR AVENTURA</span>
                         </button>
 
-                        <button id="btnViewInvite" type="button" class="nes-btn nes-btn-green w-full py-3 rounded-lg text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                        <button id="btnViewInvite" class="nes-btn nes-btn-green w-full py-2.5 sm:py-3 rounded-lg text-[10px] sm:text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
                             <span>🎂 VER INVITACIÓN</span>
                         </button>
                     </div>
 
-                    <p class="text-[8px] text-gray-400 mt-2">Toca la pantalla para jugar</p>
+                    <p class="text-[8px] text-gray-400 mt-2">Usa Teclado o Controles Táctiles</p>
                 </div>
             </div>
 
             <!-- MODAL INVITACIÓN -->
-            <div id="inviteModal" class="hidden absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-2 z-50">
+            <div id="inviteModal" class="hidden absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-2 z-40">
                 <div class="mario-border bg-gradient-to-b from-red-950 via-yellow-950 to-black p-3 sm:p-4 max-w-sm w-full max-h-full overflow-y-auto rounded-xl relative text-center flex flex-col justify-between">
-                    <button id="btnCloseInvite" type="button" class="absolute top-1.5 right-1.5 bg-red-600 text-white border border-white w-7 h-7 rounded-full text-xs font-bold hover:bg-red-700 flex items-center justify-center z-50">✕</button>
+                    <button id="btnCloseInvite" class="absolute top-1.5 right-1.5 bg-red-600 text-white border border-white w-6 h-6 rounded-full text-[10px] font-bold hover:bg-red-700 flex items-center justify-center">✕</button>
 
                     <span class="text-[8px] sm:text-[10px] text-yellow-300 tracking-widest bg-black/60 px-2 py-0.5 rounded-full border border-yellow-400 inline-block self-center mt-1">TARJETA OFICIAL</span>
                     <h2 class="text-lg sm:text-xl text-red-500 mt-1 mb-0.5 drop-shadow-[0_2px_0_#fff]">SANTIAGO</h2>
@@ -157,21 +150,21 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-1 mb-2">
-                        <button id="btnToastBloque" type="button" class="bg-yellow-500 border border-white p-1 rounded text-[8px] text-black font-bold active:bg-yellow-400">❓ BLOQUE</button>
-                        <button id="btnToastEstrella" type="button" class="bg-yellow-500 border border-white p-1 rounded text-[8px] text-black font-bold active:bg-yellow-400">⭐ ESTRELLA</button>
-                        <button id="btnToastHongo" type="button" class="bg-red-500 border border-white p-1 rounded text-[8px] text-white font-bold active:bg-red-400">🍄 HONGO</button>
+                        <button onclick="playToast('🎉 ¡Te esperamos con toda la diversión!')" class="bg-yellow-500 border border-white p-1 rounded text-[8px] text-black font-bold hover:bg-yellow-400">❓ BLOQUE</button>
+                        <button onclick="playToast('⭐ ¡Energía y Poder Invencible!')" class="bg-yellow-500 border border-white p-1 rounded text-[8px] text-black font-bold hover:bg-yellow-400">⭐ ESTRELLA</button>
+                        <button onclick="playToast('🍄 ¡Santiago crece a 5 Años!')" class="bg-red-500 border border-white p-1 rounded text-[8px] text-white font-bold hover:bg-red-400">🍄 HONGO</button>
                     </div>
 
                     <div id="toastMessage" class="hidden bg-yellow-300 text-black text-[8px] p-1 rounded mb-2 font-bold border border-black animate-pulse"></div>
 
-                    <button id="btnStartFromInvite" type="button" class="nes-btn w-full py-2.5 text-[10px] sm:text-xs rounded uppercase">
+                    <button id="btnStartFromInvite" class="nes-btn w-full py-2 text-[10px] sm:text-xs rounded uppercase">
                         ▶ JUGAR MUNDO 1-1
                     </button>
                 </div>
             </div>
 
             <!-- MODAL FIN -->
-            <div id="endModal" class="hidden absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-2 text-center z-50">
+            <div id="endModal" class="hidden absolute inset-0 bg-black/90 flex flex-col items-center justify-center p-2 text-center z-40">
                 <div class="mario-border bg-gray-900 p-4 max-w-xs w-full rounded-xl">
                     <h2 id="endTitle" class="text-yellow-400 text-xs sm:text-sm mb-1">COURSE CLEAR!</h2>
                     <p id="endMessage" class="text-[10px] mb-3 text-gray-200">¡Has completado el Mundo 1-1!</p>
@@ -182,34 +175,34 @@
                     </div>
 
                     <div class="space-y-1.5">
-                        <button id="btnReplay" type="button" class="nes-btn w-full py-2 text-[10px] rounded">JUGAR DE NUEVO</button>
-                        <button id="btnOpenInviteFromEnd" type="button" class="nes-btn nes-btn-green w-full py-2 text-[10px] rounded">VER INVITACIÓN</button>
+                        <button id="btnReplay" class="nes-btn w-full py-1.5 text-[10px] rounded">JUGAR DE NUEVO</button>
+                        <button id="btnOpenInviteFromEnd" class="nes-btn nes-btn-green w-full py-1.5 text-[10px] rounded">VER INVITACIÓN</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- CONTROLES TÁCTILES MÓVILES -->
-        <div class="w-full flex justify-between items-center mt-1 px-1 sm:hidden shrink-0 z-30">
+        <div class="w-full flex justify-between items-center mt-1 px-1 sm:hidden shrink-0">
             <div class="grid grid-cols-3 gap-1 w-28 h-28">
                 <div></div>
-                <button id="btnUp" type="button" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center active:bg-gray-600 font-bold text-base">▲</button>
+                <button id="btnUp" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center active:bg-gray-600 font-bold text-base">▲</button>
                 <div></div>
-                <button id="btnLeft" type="button" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center active:bg-gray-600 font-bold text-base">◀</button>
+                <button id="btnLeft" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center active:bg-gray-600 font-bold text-base">◀</button>
                 <div class="bg-gray-900 border border-gray-700 rounded-full flex items-center justify-center text-[7px] text-gray-500">NES</div>
-                <button id="btnRight" type="button" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center active:bg-gray-600 font-bold text-base">▶</button>
+                <button id="btnRight" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center active:bg-gray-600 font-bold text-base">▶</button>
                 <div></div>
-                <button id="btnDown" type="button" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center active:bg-gray-600 font-bold text-base">▼</button>
+                <button id="btnDown" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center active:bg-gray-600 font-bold text-base">▼</button>
                 <div></div>
             </div>
 
             <div class="flex space-x-2 items-center">
                 <div class="flex flex-col items-center space-y-0.5">
-                    <button id="btnRun" type="button" class="w-12 h-12 bg-red-600 border border-white rounded-full text-white font-bold active:bg-red-800 flex items-center justify-center shadow-lg text-xs">B</button>
+                    <button id="btnRun" class="w-11 h-11 bg-red-600 border border-white rounded-full text-white font-bold active:bg-red-800 flex items-center justify-center shadow-lg text-xs">B</button>
                     <span class="text-[7px] text-gray-400">CORRER</span>
                 </div>
                 <div class="flex flex-col items-center space-y-0.5">
-                    <button id="btnJump" type="button" class="w-12 h-12 bg-yellow-500 border border-white rounded-full text-black font-bold active:bg-yellow-700 flex items-center justify-center shadow-lg text-xs">A</button>
+                    <button id="btnJump" class="w-11 h-11 bg-yellow-500 border border-white rounded-full text-black font-bold active:bg-yellow-700 flex items-center justify-center shadow-lg text-xs">A</button>
                     <span class="text-[7px] text-gray-400">SALTAR</span>
                 </div>
             </div>
@@ -224,33 +217,120 @@
     </div>
 
     <script>
-        // CONTROL DE REPRODUCCIÓN Y MÚSICA DE FONDO (MARIO.MP3)
         class MarioAudioEngine {
             constructor() {
-                this.bgm = document.getElementById('bgmAudio');
+                this.ctx = null;
                 this.muted = false;
+                this.bgmTimer = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playTone(freq, duration, type = 'square', volume = 0.08) {
+                if (!this.ctx || this.muted) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) {}
+            }
+
+            jump() {
+                if (!this.ctx || this.muted) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.18);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.18);
+            }
+
+            coin() {
+                if (!this.ctx || this.muted) return;
+                this.playTone(987.77, 0.08, 'square', 0.1);
+                setTimeout(() => this.playTone(1318.51, 0.25, 'square', 0.1), 75);
+            }
+
+            stomp() { this.playTone(120, 0.09, 'triangle', 0.2); }
+            kick() { this.playTone(220, 0.12, 'sawtooth', 0.2); }
+            breakBrick() {
+                this.playTone(80, 0.08, 'sawtooth', 0.25);
+                this.playTone(140, 0.1, 'square', 0.15);
+            }
+
+            powerup() {
+                if (!this.ctx || this.muted) return;
+                const notes = [330, 392, 659, 523, 587, 784, 880, 1046];
+                notes.forEach((freq, idx) => {
+                    setTimeout(() => this.playTone(freq, 0.06, 'square', 0.08), idx * 40);
+                });
+            }
+
+            bump() { this.playTone(90, 0.08, 'triangle', 0.25); }
+
+            flagpole() {
+                if (!this.ctx || this.muted) return;
+                const notes = [261, 329, 392, 523, 659, 784, 1046];
+                notes.forEach((f, i) => setTimeout(() => this.playTone(f, 0.1, 'square', 0.1), i * 70));
+            }
+
+            die() {
+                if (!this.ctx || this.muted) return;
+                const notes = [400, 350, 300, 250, 200, 150];
+                notes.forEach((f, i) => setTimeout(() => this.playTone(f, 0.1, 'sawtooth', 0.2), i * 75));
             }
 
             startBGM() {
-                if (this.bgm && !this.muted) {
-                    this.bgm.play().catch(() => {});
-                }
+                if (this.bgmTimer) return;
+                this.init();
+                const tempo = 180;
+                const beat = 60000 / tempo / 4;
+
+                const melody = [
+                    {f: 659, d: 1}, {f: 659, d: 1}, {f: 0, d: 1}, {f: 659, d: 1}, 
+                    {f: 0, d: 1}, {f: 523, d: 1}, {f: 659, d: 2}, {f: 784, d: 2}, 
+                    {f: 0, d: 2}, {f: 392, d: 2}, {f: 0, d: 2},
+                    {f: 523, d: 2}, {f: 0, d: 1}, {f: 392, d: 2}, {f: 0, d: 1}, {f: 330, d: 2},
+                    {f: 0, d: 1}, {f: 440, d: 1}, {f: 493, d: 1}, {f: 466, d: 1}, {f: 440, d: 1},
+                    {f: 392, d: 1.3}, {f: 659, d: 1.3}, {f: 784, d: 1.3}, {f: 880, d: 1}, {f: 698, d: 1}, {f: 784, d: 1}
+                ];
+
+                let step = 0;
+                const loop = () => {
+                    if (!this.ctx || this.muted) return;
+                    const note = melody[step % melody.length];
+                    if (note.f > 0) this.playTone(note.f, (beat * note.d) / 1000, 'square', 0.03);
+                    step++;
+                    this.bgmTimer = setTimeout(loop, beat * note.d);
+                };
+                loop();
             }
 
             stopBGM() {
-                if (this.bgm) {
-                    this.bgm.pause();
+                if (this.bgmTimer) {
+                    clearTimeout(this.bgmTimer);
+                    this.bgmTimer = null;
                 }
-            }
-
-            toggleAudio() {
-                this.muted = !this.muted;
-                if (this.muted) {
-                    this.stopBGM();
-                } else {
-                    this.startBGM();
-                }
-                return !this.muted;
             }
         }
 
@@ -264,64 +344,6 @@
                 setTimeout(() => toast.classList.add('hidden'), 2500);
             }
         }
-
-        // EVITAR ZOOM Y BLOQUEOS EN DISPOSITIVOS TÁCTILES
-        function attachMobileClick(elementId, callback) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-
-            const handleTouch = (e) => {
-                e.preventDefault(); // Previene el zoom del navegador
-                audio.startBGM();
-                callback();
-            };
-
-            el.addEventListener('touchend', handleTouch, false);
-            el.addEventListener('click', (e) => {
-                audio.startBGM();
-                callback();
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Asignación de acciones a los botones
-            attachMobileClick('btnPlayGame', () => {
-                document.getElementById('startMenuModal').classList.add('hidden');
-            });
-
-            attachMobileClick('btnViewInvite', () => {
-                document.getElementById('startMenuModal').classList.add('hidden');
-                document.getElementById('inviteModal').classList.remove('hidden');
-            });
-
-            attachMobileClick('btnCloseInvite', () => {
-                document.getElementById('inviteModal').classList.add('hidden');
-                document.getElementById('startMenuModal').classList.remove('hidden');
-            });
-
-            attachMobileClick('btnStartFromInvite', () => {
-                document.getElementById('inviteModal').classList.add('hidden');
-            });
-
-            attachMobileClick('btnReplay', () => {
-                document.getElementById('endModal').classList.add('hidden');
-            });
-
-            attachMobileClick('btnOpenInviteFromEnd', () => {
-                document.getElementById('endModal').classList.add('hidden');
-                document.getElementById('inviteModal').classList.remove('hidden');
-            });
-
-            attachMobileClick('audioToggle', () => {
-                const active = audio.toggleAudio();
-                document.getElementById('audioToggle').innerText = active ? '🔊' : '🔇';
-            });
-
-            // Botones interactivos de la tarjeta
-            attachMobileClick('btnToastBloque', () => playToast('🎉 ¡Te esperamos con toda la diversión!'));
-            attachMobileClick('btnToastEstrella', () => playToast('⭐ ¡Energía y Poder Invencible!'));
-            attachMobileClick('btnToastHongo', () => playToast('🍄 ¡Santiago crece a 5 Años!'));
-        });
     </script>
 </body>
 </html>
