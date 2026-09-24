@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Mario Bros World 1-1 - Santiago Cumple 5 Años</title>
+    <title>Super Santiago Bros World 1-1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* Bloqueo estricto de gestos de zoom a nivel global */
+        /* Bloqueo total de zoom y selección táctil */
         *, *::before, *::after {
-            touch-action: none !important;
+            touch-action: manipulation !important;
             -webkit-touch-callout: none !important;
             -webkit-user-select: none !important;
             user-select: none !important;
@@ -54,6 +54,10 @@
             background: linear-gradient(180deg, #00a800 0%, #005000 100%);
             box-shadow: inset -2px -2px 0px 0px #003000, 0 3px 0 #000;
         }
+
+        .nes-btn-green:active {
+            box-shadow: inset 1px 1px 0px 0px #003000, 0 1px 0 #000;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center h-dvh w-screen text-white relative p-1 overflow-hidden select-none">
@@ -95,22 +99,30 @@
             <!-- MENÚ INICIAL -->
             <div id="startMenuModal" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-2 text-center z-50">
                 <div class="mario-border bg-gradient-to-b from-blue-900 via-indigo-950 to-black p-4 max-w-sm w-full rounded-xl flex flex-col items-center justify-center">
-                    <div class="bg-red-600 text-yellow-300 border border-white px-2 py-0.5 text-[9px] mb-2 rounded font-bold">
-                        ★ SUPER MARIO BROS WORLD 1-1 ★
+                    
+                    <!-- TEXTO MODIFICADO A SUPER SANTIAGO -->
+                    <div class="bg-red-600 text-yellow-300 border border-white px-2 py-1 text-[9px] mb-2 rounded font-bold">
+                        ★ SUPER SANTIAGO BROS WORLD 1-1 ★
                     </div>
-                    <h1 class="text-yellow-400 text-lg mb-0.5">SUPER MARIO</h1>
+                    <h1 class="text-yellow-400 text-base sm:text-lg mb-0.5 drop-shadow-[0_2px_0_#000]">SUPER SANTIAGO</h1>
                     <p class="text-green-400 text-xs mb-3">SANTIAGO CUMPLE 5 AÑOS</p>
 
-                    <!-- BOTONES DEL MENÚ -->
-                    <div class="w-full space-y-3">
-                        <button id="btnPlayGame" type="button" class="nes-btn w-full py-3 rounded-lg text-xs uppercase tracking-wider block">
-                            ▶ JUGAR AVENTURA
-                        </button>
+                    <div class="w-full bg-yellow-500/10 border border-yellow-400 p-1.5 rounded mb-3 text-[8px] sm:text-[10px] text-yellow-200">
+                        ⭐ ¡Elige una opción para comenzar!
+                    </div>
 
+                    <!-- BOTONES CON ORDEN INVERTIDO (INVITACIÓN ARRIBA, JUGAR ABAJO) -->
+                    <div class="w-full space-y-3">
                         <button id="btnViewInvite" type="button" class="nes-btn nes-btn-green w-full py-3 rounded-lg text-xs uppercase tracking-wider block">
                             🎂 VER INVITACIÓN
                         </button>
+
+                        <button id="btnPlayGame" type="button" class="nes-btn w-full py-3 rounded-lg text-xs uppercase tracking-wider block">
+                            ▶ JUGAR AVENTURA
+                        </button>
                     </div>
+
+                    <p class="text-[8px] text-gray-400 mt-3">Usa Teclado o Controles Táctiles</p>
                 </div>
             </div>
 
@@ -142,6 +154,32 @@
                 </div>
             </div>
         </div>
+
+        <!-- CONTROLES TÁCTILES MÓVILES -->
+        <div class="w-full flex justify-between items-center mt-1 px-1 sm:hidden shrink-0 z-30">
+            <div class="grid grid-cols-3 gap-1 w-28 h-28">
+                <div></div>
+                <button id="btnUp" type="button" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center font-bold text-base">▲</button>
+                <div></div>
+                <button id="btnLeft" type="button" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center font-bold text-base">◀</button>
+                <div class="bg-gray-900 border border-gray-700 rounded-full flex items-center justify-center text-[7px] text-gray-500">NES</div>
+                <button id="btnRight" type="button" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center font-bold text-base">▶</button>
+                <div></div>
+                <button id="btnDown" type="button" class="bg-gray-800 border border-white text-white rounded-lg flex items-center justify-center font-bold text-base">▼</button>
+                <div></div>
+            </div>
+
+            <div class="flex space-x-2 items-center">
+                <div class="flex flex-col items-center space-y-0.5">
+                    <button id="btnRun" type="button" class="w-12 h-12 bg-red-600 border border-white rounded-full text-white font-bold flex items-center justify-center text-xs">B</button>
+                    <span class="text-[7px] text-gray-400">CORRER</span>
+                </div>
+                <div class="flex flex-col items-center space-y-0.5">
+                    <button id="btnJump" type="button" class="w-12 h-12 bg-yellow-500 border border-white rounded-full text-black font-bold flex items-center justify-center text-xs">A</button>
+                    <span class="text-[7px] text-gray-400">SALTAR</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -162,42 +200,45 @@
             }
         }
 
-        // CONTROLADOR POINTERDOWN PARA MÓVILES
-        function bindAction(id, handler) {
+        // Asignación de acción inmediata al tocar la pantalla sin hacer zoom
+        function bindTouchAction(id, handler) {
             const el = document.getElementById(id);
             if (!el) return;
 
-            el.addEventListener('pointerdown', (e) => {
-                e.preventDefault();
+            const execute = (e) => {
+                if (e.cancelable) e.preventDefault();
                 playMusic();
                 handler();
-            });
+            };
+
+            el.addEventListener('pointerdown', execute, { passive: false });
+            el.addEventListener('click', execute, { passive: false });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            bindAction('btnPlayGame', () => {
-                document.getElementById('startMenuModal').classList.add('hidden');
-            });
-
-            bindAction('btnViewInvite', () => {
+            bindTouchAction('btnViewInvite', () => {
                 document.getElementById('startMenuModal').classList.add('hidden');
                 document.getElementById('inviteModal').classList.remove('hidden');
             });
 
-            bindAction('btnCloseInvite', () => {
+            bindTouchAction('btnPlayGame', () => {
+                document.getElementById('startMenuModal').classList.add('hidden');
+            });
+
+            bindTouchAction('btnCloseInvite', () => {
                 document.getElementById('inviteModal').classList.add('hidden');
                 document.getElementById('startMenuModal').classList.remove('hidden');
             });
 
-            bindAction('btnStartFromInvite', () => {
+            bindTouchAction('btnStartFromInvite', () => {
                 document.getElementById('inviteModal').classList.add('hidden');
             });
 
-            bindAction('btnToastBloque', () => showToast('🎉 ¡Te esperamos con toda la diversión!'));
-            bindAction('btnToastEstrella', () => showToast('⭐ ¡Energía y Poder Invencible!'));
-            bindAction('btnToastHongo', () => showToast('🍄 ¡Santiago crece a 5 Años!'));
+            bindTouchAction('btnToastBloque', () => showToast('🎉 ¡Te esperamos con toda la diversión!'));
+            bindTouchAction('btnToastEstrella', () => showToast('⭐ ¡Energía y Poder Invencible!'));
+            bindTouchAction('btnToastHongo', () => showToast('🍄 ¡Santiago crece a 5 Años!'));
 
-            bindAction('audioToggle', () => {
+            bindTouchAction('audioToggle', () => {
                 if (bgm.paused) {
                     bgm.play();
                     document.getElementById('audioToggle').innerText = '🔊';
