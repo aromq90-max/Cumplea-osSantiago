@@ -62,8 +62,8 @@
 </head>
 <body class="flex flex-col items-center justify-center h-dvh w-screen text-white relative p-1 sm:p-2 overflow-hidden">
 
-    <!-- REPRODUCTOR DE MÚSICA DE FONDO MP3 -->
-    <audio id="bgmAudio" src="mario.mp3" loop preload="auto"></audio>
+    <!-- REPRODUCTOR DE MÚSICA DE FONDO MP3 CON RUTA RELATIVA Y MANEJO DE ERROR -->
+    <audio id="bgmAudio" src="./mario.mp3" loop preload="auto" onerror="console.warn('No se pudo encontrar mario.mp3 en el servidor.')"></audio>
 
     <div class="relative w-full max-w-2xl h-full flex flex-col items-center justify-between py-1">
         
@@ -227,7 +227,7 @@
         function startAudio() {
             if (bgm && bgm.paused && !isMuted) {
                 bgm.volume = 0.5;
-                bgm.play().catch(e => console.log("Auto-play prevenido por el navegador:", e));
+                bgm.play().catch(e => console.log("Auto-play bloqueado temporalmente:", e));
             }
         }
 
@@ -235,10 +235,10 @@
             isMuted = !isMuted;
             const btn = document.getElementById('audioToggle');
             if (isMuted) {
-                bgm.pause();
+                if (bgm) bgm.pause();
                 btn.innerText = '🔇';
             } else {
-                bgm.play();
+                if (bgm) bgm.play().catch(e => console.log(e));
                 btn.innerText = '🔊';
             }
         }
@@ -317,20 +317,20 @@
 
             flagpole() {
                 if (isMuted) return;
-                bgm.pause();
+                if (bgm) bgm.pause();
                 const notes = [261, 329, 392, 523, 659, 784, 1046];
                 notes.forEach((f, i) => setTimeout(() => this.playTone(f, 0.1, 'square', 0.1), i * 70));
             }
 
             die() {
                 if (isMuted) return;
-                bgm.pause();
+                if (bgm) bgm.pause();
                 const notes = [400, 350, 300, 250, 200, 150];
                 notes.forEach((f, i) => setTimeout(() => this.playTone(f, 0.1, 'sawtooth', 0.2), i * 75));
             }
 
             startBGM() { startAudio(); }
-            stopBGM() { bgm.pause(); }
+            stopBGM() { if (bgm) bgm.pause(); }
         }
 
         const audio = new MarioAudioEngine();
