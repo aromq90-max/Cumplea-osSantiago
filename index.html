@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* Bloqueo total de zoom y selección táctil */
         *, *::before, *::after {
             touch-action: manipulation !important;
             -webkit-touch-callout: none !important;
@@ -54,10 +53,6 @@
             background: linear-gradient(180deg, #00a800 0%, #005000 100%);
             box-shadow: inset -2px -2px 0px 0px #003000, 0 3px 0 #000;
         }
-
-        .nes-btn-green:active {
-            box-shadow: inset 1px 1px 0px 0px #003000, 0 1px 0 #000;
-        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center h-dvh w-screen text-white relative p-1 overflow-hidden select-none">
@@ -67,10 +62,10 @@
 
     <div class="relative w-full max-w-2xl h-full flex flex-col items-center justify-between py-1">
         
-        <!-- HUD NES BAR -->
+        <!-- HUD BAR -->
         <div class="w-full bg-black border-2 sm:border-4 border-white p-1.5 mb-1 flex justify-between items-center text-[8px] sm:text-xs tracking-wider mario-border rounded-lg shrink-0 z-10">
             <div class="flex flex-col">
-                <span class="text-red-500 font-bold">MARIO</span>
+                <span class="text-red-500 font-bold">SANTIAGO</span>
                 <span id="hud-score" class="text-white">000000</span>
             </div>
 
@@ -100,18 +95,13 @@
             <div id="startMenuModal" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-2 text-center z-50">
                 <div class="mario-border bg-gradient-to-b from-blue-900 via-indigo-950 to-black p-4 max-w-sm w-full rounded-xl flex flex-col items-center justify-center">
                     
-                    <!-- TEXTO MODIFICADO A SUPER SANTIAGO -->
                     <div class="bg-red-600 text-yellow-300 border border-white px-2 py-1 text-[9px] mb-2 rounded font-bold">
                         ★ SUPER SANTIAGO BROS WORLD 1-1 ★
                     </div>
-                    <h1 class="text-yellow-400 text-base sm:text-lg mb-0.5 drop-shadow-[0_2px_0_#000]">SUPER SANTIAGO</h1>
+                    <h1 class="text-yellow-400 text-base sm:text-lg mb-0.5">SUPER SANTIAGO</h1>
                     <p class="text-green-400 text-xs mb-3">SANTIAGO CUMPLE 5 AÑOS</p>
 
-                    <div class="w-full bg-yellow-500/10 border border-yellow-400 p-1.5 rounded mb-3 text-[8px] sm:text-[10px] text-yellow-200">
-                        ⭐ ¡Elige una opción para comenzar!
-                    </div>
-
-                    <!-- BOTONES CON ORDEN INVERTIDO (INVITACIÓN ARRIBA, JUGAR ABAJO) -->
+                    <!-- BOTONES CON INVITACIÓN ARRIBA Y JUGAR ABAJO -->
                     <div class="w-full space-y-3">
                         <button id="btnViewInvite" type="button" class="nes-btn nes-btn-green w-full py-3 rounded-lg text-xs uppercase tracking-wider block">
                             🎂 VER INVITACIÓN
@@ -183,12 +173,103 @@
     </div>
 
     <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
         const bgm = document.getElementById('bgmAudio');
 
-        function playMusic() {
-            if (bgm && bgm.paused) {
-                bgm.play().catch(() => {});
+        let gameRunning = false;
+
+        // Estado del jugador (Santiago / Mario)
+        const player = {
+            x: 30,
+            y: 160,
+            width: 14,
+            height: 16,
+            velocityX: 0,
+            velocityY: 0,
+            speed: 1.8,
+            jumpPower: -6.5,
+            gravity: 0.35,
+            grounded: false
+        };
+
+        const keys = { left: false, right: false, up: false };
+
+        // Dibujar elementos en pantalla
+        function drawScene() {
+            // Fondo azul cielo
+            ctx.fillStyle = '#5c94fc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Suelo (estilo NES)
+            ctx.fillStyle = '#c84c0c';
+            ctx.fillRect(0, 192, canvas.width, 32);
+
+            // Detalle superior del suelo
+            ctx.fillStyle = '#00a800';
+            ctx.fillRect(0, 192, canvas.width, 4);
+
+            // Bloque de interrogación ?
+            ctx.fillStyle = '#fc9838';
+            ctx.fillRect(80, 130, 16, 16);
+            ctx.fillStyle = '#000000';
+            ctx.font = '10px "Press Start 2P"';
+            ctx.fillText('?', 84, 143);
+
+            // Bloques de ladrillo
+            ctx.fillStyle = '#b84418';
+            ctx.fillRect(120, 130, 16, 16);
+            ctx.fillRect(136, 130, 16, 16);
+
+            // Santiago (Personaje)
+            ctx.fillStyle = '#e52521'; // Gorra/Camisa roja
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#0024e0'; // Overol azul
+            ctx.fillRect(player.x + 2, player.y + 8, player.width - 4, 8);
+        }
+
+        function updateGame() {
+            if (!gameRunning) return;
+
+            // Movimiento lateral
+            if (keys.left) player.velocityX = -player.speed;
+            else if (keys.right) player.velocityX = player.speed;
+            else player.velocityX = 0;
+
+            // Salto
+            if (keys.up && player.grounded) {
+                player.velocityY = player.jumpPower;
+                player.grounded = false;
             }
+
+            // Gravedad
+            player.velocityY += player.gravity;
+
+            // Aplicar posiciones
+            player.x += player.velocityX;
+            player.y += player.velocityY;
+
+            // Colisión con el suelo
+            if (player.y + player.height >= 192) {
+                player.y = 192 - player.height;
+                player.velocityY = 0;
+                player.grounded = true;
+            }
+
+            // Limites laterales
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            drawScene();
+            requestAnimationFrame(updateGame);
+        }
+
+        function startGame() {
+            gameRunning = true;
+            document.getElementById('startMenuModal').classList.add('hidden');
+            document.getElementById('inviteModal').classList.add('hidden');
+            if (bgm && bgm.paused) bgm.play().catch(() => {});
+            updateGame();
         }
 
         function showToast(msg) {
@@ -200,14 +281,12 @@
             }
         }
 
-        // Asignación de acción inmediata al tocar la pantalla sin hacer zoom
         function bindTouchAction(id, handler) {
             const el = document.getElementById(id);
             if (!el) return;
 
             const execute = (e) => {
                 if (e.cancelable) e.preventDefault();
-                playMusic();
                 handler();
             };
 
@@ -215,14 +294,28 @@
             el.addEventListener('click', execute, { passive: false });
         }
 
+        // Eventos del teclado
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') keys.up = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') keys.up = false;
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
+            drawScene(); // Render inicial del escenario
+
+            bindTouchAction('btnPlayGame', startGame);
+            bindTouchAction('btnStartFromInvite', startGame);
+
             bindTouchAction('btnViewInvite', () => {
                 document.getElementById('startMenuModal').classList.add('hidden');
                 document.getElementById('inviteModal').classList.remove('hidden');
-            });
-
-            bindTouchAction('btnPlayGame', () => {
-                document.getElementById('startMenuModal').classList.add('hidden');
             });
 
             bindTouchAction('btnCloseInvite', () => {
@@ -230,9 +323,16 @@
                 document.getElementById('startMenuModal').classList.remove('hidden');
             });
 
-            bindTouchAction('btnStartFromInvite', () => {
-                document.getElementById('inviteModal').classList.add('hidden');
+            // Controles táctiles móviles
+            bindTouchAction('btnLeft', () => keys.left = true);
+            bindTouchAction('btnRight', () => keys.right = true);
+            bindTouchAction('btnJump', () => {
+                keys.up = true;
+                setTimeout(() => keys.up = false, 200);
             });
+
+            document.getElementById('btnLeft').addEventListener('pointerup', () => keys.left = false);
+            document.getElementById('btnRight').addEventListener('pointerup', () => keys.right = false);
 
             bindTouchAction('btnToastBloque', () => showToast('🎉 ¡Te esperamos con toda la diversión!'));
             bindTouchAction('btnToastEstrella', () => showToast('⭐ ¡Energía y Poder Invencible!'));
